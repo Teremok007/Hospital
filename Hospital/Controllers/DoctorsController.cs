@@ -6,18 +6,30 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using System.Linq;
 using Hospital.Models;
+using Hospital.Repositories;
+
 
 namespace Hospital.Controllers
 {
     public class DoctorsController : Controller
     {
-        private HospitalContext db = new HospitalContext();
+        //private HospitalContext db = new HospitalContext();
+        private IDoctorRepository repo; 
 
-        // GET: Doctors
-        public ActionResult Index()
+        public DoctorsController(IDoctorRepository repo)
         {
-            return View(db.Doctors.ToList());
+            this.repo = repo;
+        }
+        // GET: Doctors
+        public ActionResult Index(string searchName)
+        {
+            if (string.IsNullOrWhiteSpace(searchName))
+            {
+                return View(repo.GetDoctors());
+            }
+            return View(repo.GetDoctors().Where(d => d.Name.IndexOf(searchName, StringComparison.OrdinalIgnoreCase) != -1));
         }
 
         // GET: Doctors/Details/5
@@ -27,7 +39,7 @@ namespace Hospital.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Doctor doctor = db.Doctors.Find(id);
+            Doctor doctor = repo.GetDoctor(id);
             if (doctor == null)
             {
                 return HttpNotFound();
@@ -50,11 +62,9 @@ namespace Hospital.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Doctors.Add(doctor);
-                db.SaveChanges();
+                repo.Add(doctor);
                 return RedirectToAction("Index");
             }
-
             return View(doctor);
         }
 
@@ -65,7 +75,7 @@ namespace Hospital.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Doctor doctor = db.Doctors.Find(id);
+            Doctor doctor = repo.GetDoctor(id);
             if (doctor == null)
             {
                 return HttpNotFound();
@@ -82,8 +92,7 @@ namespace Hospital.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(doctor).State = EntityState.Modified;
-                db.SaveChanges();
+                repo.Edit(doctor);
                 return RedirectToAction("Index");
             }
             return View(doctor);
@@ -96,7 +105,7 @@ namespace Hospital.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Doctor doctor = db.Doctors.Find(id);
+            Doctor doctor = repo.GetDoctor(id);
             if (doctor == null)
             {
                 return HttpNotFound();
@@ -109,9 +118,7 @@ namespace Hospital.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Doctor doctor = db.Doctors.Find(id);
-            db.Doctors.Remove(doctor);
-            db.SaveChanges();
+            repo.Remove(id);
             return RedirectToAction("Index");
         }
 
@@ -119,7 +126,7 @@ namespace Hospital.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repo.Dispose();
             }
             base.Dispose(disposing);
         }
