@@ -12,6 +12,10 @@ namespace Hospital.Repositories
     {
         IEnumerable<Patient> GetPatients();
 
+        IEnumerable<Doctor> GetDoctors(int? patientId);
+
+        ICollection<Doctor> GetDoctorsById(int[] doctorsId);
+
         Patient GetPatient(int? id);
 
         void Edit(Patient patient);
@@ -19,5 +23,7 @@ namespace Hospital.Repositories
         void Add(Patient patient);
 
         void Remove(int id);
+
+
     }
 }

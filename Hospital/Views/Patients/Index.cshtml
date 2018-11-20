@@ -34,8 +34,13 @@
                 @Html.DisplayFor(modelItem => item.DayOfBirth)
             </td>
             <td>
+                <ul>
+                    @foreach(var doctor in item.Doctors)
+                    {
+                        <li>@doctor.Name&nbsp;(@doctor.Specialization.Name)</li>
+                    }
+                </ul>
 
-                @Html.DisplayFor(modelItem => item.Doctors)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |

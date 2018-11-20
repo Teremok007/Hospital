@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using System.Linq;
 using Hospital.Models;
 using Hospital.Repositories;
 
@@ -50,7 +49,8 @@ namespace Hospital.Controllers
         // GET: Doctors/Create
         public ActionResult Create()
         {
-            return View();
+            
+            return View(new DoctorEditViewModel() { Specializations = repo.GetSpecializations() });
         }
 
         // POST: Doctors/Create
@@ -58,7 +58,7 @@ namespace Hospital.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Name,Specialization")] Doctor doctor)
+        public ActionResult Create([Bind(Include = "Id,Name,SpecializationId")] Doctor doctor)
         {
             if (ModelState.IsValid)
             {
@@ -80,7 +80,17 @@ namespace Hospital.Controllers
             {
                 return HttpNotFound();
             }
-            return View(doctor);
+            var patients = doctor.Patients.Select(p => new { PatientId = p.Id, PatientName = p.Name }).ToList();
+
+            return View(new DoctorEditViewModel()
+            {
+                Specializations = repo.GetSpecializations(),
+                Doctor = doctor,
+                Patients = new MultiSelectList(
+                    patients,
+                    "PatientId",
+                    "PatientName")
+            });
         }
 
         // POST: Doctors/Edit/5
