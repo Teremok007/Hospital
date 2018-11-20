@@ -39,7 +39,7 @@ namespace Hospital.Repositories
 
         public IEnumerable<Patient> GetPatients()
         {
-            return db.Patients;
+            return db.Patients.ToList();
         }
 
         public void Remove(int id)
@@ -49,14 +49,14 @@ namespace Hospital.Repositories
             db.SaveChanges();
         }
 
-        public IEnumerable<Doctor> GetDoctors(int patientId)
+        public IEnumerable<Doctor> GetDoctors(int? patientId)
         {
             Patient patient = GetPatient(patientId);
             if (patient == null)
             {
-                return null;
+                return db.Doctors.ToList();
             }
-            return patient.Doctors;
+            return patient.Doctors.ToList();
         }
     }
 }
