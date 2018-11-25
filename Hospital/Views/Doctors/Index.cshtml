@@ -6,15 +6,14 @@
 
 <h2>Doctors</h2>
 
-
-    <p>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<p>
     @using (Html.BeginForm("Index", "Doctors", FormMethod.Get))
     {
         <div class="search">Doc name: @Html.TextBox("searchName")<input type="submit" value="Search" /></div>
     }
-    </p>
-    <p>
-        @Html.ActionLink("Create New", "Create")
     </p>
     <table class="table">
         <tr>
@@ -34,7 +33,7 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Specialization.Name)
+                    @Html.DisplayFor(modelItem => item.Specialization)
                 </td>
                 <td>
                     @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |

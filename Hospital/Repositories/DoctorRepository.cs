@@ -39,7 +39,7 @@ namespace Hospital.Repositories
 
         public IEnumerable<Doctor> GetDoctors()
         {
-            return db.Doctors.ToList();
+            return db.Doctors;
         }
 
         public void Remove(int id)
@@ -56,17 +56,8 @@ namespace Hospital.Repositories
             {
                 return null;
             }
-            return doctor.Patients.ToList();
+            return doctor.Patients;
         }
-
-        public IEnumerable<Specialization> GetSpecializations()
-        {
-            return db.Specializations.OrderBy(s => s.Name);
-        }
-
-        public Specialization GetDoctorSpecialization(Doctor doctor)
-        {
-            return db.Specializations.Find(doctor.SpecializationId);
-        }
+        
     }
 }
