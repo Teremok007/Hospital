@@ -11,6 +11,8 @@ namespace Hospital.Repositories
     {
         IEnumerable<Doctor> GetDoctors();
 
+        IEnumerable<Specialization> GetSpecializations();
+
         Doctor GetDoctor(int? id);
 
         void Edit(Doctor doctor);

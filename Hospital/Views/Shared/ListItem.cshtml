@@ -1,0 +1,16 @@
+﻿@using Hospital.Models;
+
+@model IEnumerable<Person>
+@{
+    Layout = null;
+}
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+<dd>
+    @item.Name
+</dd>
+    }
+}

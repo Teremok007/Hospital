@@ -23,17 +23,18 @@ namespace Hospital.Models
         /// TODO: change it to enum
         /// </summary>
         public PatientStatus Status { get; set; }
-
-        //[RegularExpression(@"[0-9]{4}-[0-9]{2}-[0-9]{2}")]
+        
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
-        public Nullable<DateTime> DayOfBirth { get; set; }
+        public DateTime DayOfBirth { get; set; }
 
         /// <summary>
         /// Идентификационный код.
         /// </summary>
+        [Display(Name = "IdentityCode")]
+        [StringLength(10, ErrorMessage = "The Identity code cannot be longer than 10 characters.")]
         public string TaxCode { get; set; }
 
-        public virtual ICollection<Doctor> Doctors { get; set; }
+        public virtual List<Doctor> Doctors { get; set; }
     }
 }

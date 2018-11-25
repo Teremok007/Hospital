@@ -10,7 +10,7 @@
 </p>
 @using (Html.BeginForm("Index", "Patients", FormMethod.Get))
 {
-    <div class="search">Doc name: @Html.TextBox("searchName")<input type="submit" value="Search" /></div>
+    <div class="search">Patient name: @Html.TextBox("searchName")<input type="submit" value="Search" /></div>
 }
 
 <table class="table">
@@ -34,8 +34,13 @@
                 @Html.DisplayFor(modelItem => item.DayOfBirth)
             </td>
             <td>
+                <ul>
+                    @foreach(var doctor in item.Doctors)
+                    {
+                        <li>@doctor.Name&nbsp;(@doctor.Specialization.Name)</li>
+                    }
+                </ul>
 
-                @Html.DisplayFor(modelItem => item.Doctors)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |

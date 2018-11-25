@@ -30,37 +30,108 @@ namespace Hospital.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            return View();
+            var doctors = repo.GetDoctors(null).
+                            Select(d => new {
+                                DoctorId = d.Id,
+                                DoctorName = d.Specialization.Name + " - " + d.Name}).
+                            ToList();
+            PatientEditViewModel patientEditViewModel = new PatientEditViewModel()
+            {
+                DoctorSelectList = new MultiSelectList(doctors, "DoctorId", "DoctorName")
+            };
+            return View(patientEditViewModel);
         }
 
         [HttpPost]
-        public ActionResult Create([Bind(Include = "Id,Name,DayOfBirth,Status,TaxCode")] Patient patient)
+        public ActionResult Create(PatientEditViewModel creatingPatient) //[Bind(Include = "Id,Name,DayOfBirth,Status,TaxCode, ")]
         {
+            List<Doctor> docs = new List<Doctor>();
+            if (creatingPatient.SelectedDoctorsId != null)
+            {
+                docs.AddRange(repo.GetDoctorsById(creatingPatient.SelectedDoctorsId.ToArray<int>()));
+            }
             if (ModelState.IsValid)
             {
-                repo.Add(patient);
+                Patient newPatient = new Patient
+                {
+                    Doctors = docs,
+                    DayOfBirth = creatingPatient.DayOfBirth,
+                    Name = creatingPatient.Name,
+                    Status = creatingPatient.Status,
+                    TaxCode = creatingPatient.TaxCode
+                };
+                repo.Add(newPatient);
                 return RedirectToAction("Index");
+            }            
+            creatingPatient.DoctorSelectList = GetDoctorsSelectList(creatingPatient.SelectedDoctorsId.ToArray<int>());
+            return View(creatingPatient);
+        }
+
+        // GET: Patient/Details/5
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            return View();
+            Patient patient = repo.GetPatient(id);
+            if (patient == null)
+            {
+                return HttpNotFound();
+            }
+            return View(patient);
         }
 
         [HttpGet]
         public ActionResult Edit(int id)
         {
             Patient patient = repo.GetPatient(id);
-            return View(patient);
+            if (patient == null)
+            {
+                return new HttpNotFoundResult("Client not found.");
+            }
+            PatientEditViewModel patientEditViewModel = new PatientEditViewModel()
+            {
+                Patient = patient,
+                DoctorSelectList = GetDoctorsSelectList(patient.Doctors.Select(d => d.Id).ToArray<int>())
+            };
+            return View(patientEditViewModel);
+        }
+
+        private MultiSelectList GetDoctorsSelectList(int[] selectedItems)
+        {
+            var doctors = repo.GetDoctors(null)
+                .OrderBy(d => d.Name)
+                .Select(d => new SelectListItem
+                {
+                    Value = d.Id.ToString(),
+                    Text = d.Name + " (" + d.Specialization.Name + ")"
+                }).ToList();            
+            return new MultiSelectList(doctors, "Value", "Text", selectedItems);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include ="Id, Name, Status, Birthday, TaxCode")] Patient patient)
+        public ActionResult Edit(PatientEditViewModel editedPatiend)
         {
+            Patient editingPatient = repo.GetPatient(editedPatiend.Id);
+            if (editingPatient == null)
+            {
+                return HttpNotFound();
+            }
             if (ModelState.IsValid)
             {
-                repo.Edit(patient);
+                editingPatient.Name = editedPatiend.Name;
+                editingPatient.TaxCode = editedPatiend.TaxCode;
+                editingPatient.Status = editedPatiend.Status;
+                editingPatient.DayOfBirth = editedPatiend.DayOfBirth;
+                editingPatient.Doctors.Clear();
+                editingPatient.Doctors.AddRange(repo.GetDoctorsById(editedPatiend.SelectedDoctorsId.ToArray()));
+                repo.Edit(editingPatient);
                 return RedirectToAction("Index");
             }
-            return View(patient);
+            editedPatiend.DoctorSelectList = GetDoctorsSelectList(editingPatient.Doctors.Select(d => d.Id).ToArray<int>());
+            return View(editedPatiend);
         }
 
         [HttpGet]
@@ -94,6 +165,6 @@ namespace Hospital.Controllers
             }
             base.Dispose(disposing);
         }
-
+        
     }
 }

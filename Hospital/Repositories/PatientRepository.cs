@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
+using Hospital.DAL;
 using Hospital.Models;
 
 namespace Hospital.Repositories
@@ -39,7 +40,7 @@ namespace Hospital.Repositories
 
         public IEnumerable<Patient> GetPatients()
         {
-            return db.Patients;
+            return db.Patients.ToList();
         }
 
         public void Remove(int id)
@@ -49,14 +50,24 @@ namespace Hospital.Repositories
             db.SaveChanges();
         }
 
-        public IEnumerable<Doctor> GetDoctors(int patientId)
+        public IEnumerable<Doctor> GetDoctors(int? patientId)
         {
             Patient patient = GetPatient(patientId);
             if (patient == null)
             {
+                return db.Doctors.ToList();
+            }
+            return patient.Doctors.ToList();
+        }
+
+        public List<Doctor> GetDoctorsById(int[] doctorsId)
+        {
+            if (doctorsId == null)
+            {
                 return null;
             }
-            return patient.Doctors;
+            var doctors = db.Doctors.Where(doc => doctorsId.Contains(doc.Id)).ToList();
+            return doctors;
         }
     }
 }

@@ -13,19 +13,30 @@
         <dt>
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.Name)
         </dd>
-
         <dt>
             @Html.DisplayNameFor(model => model.Specialization)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Specialization)
+            @Model.Specialization.Name<br />
+            (@Model.Specialization.Description)
         </dd>
-
+        <dt>
+            @Html.DisplayNameFor(model => model.Patients)
+        </dt>
+   
+            @if (Model != null)
+            {
+                foreach (var item in Model.Patients)
+                {
+        <dd>
+                    @Html.ActionLink(@item.Name, "Details", "Patients", new { id = @item.Id }, null)
+        </dd>
+               }
+            }
+   
     </dl>
 </div>
 <p>
